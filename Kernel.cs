@@ -23,21 +23,21 @@ namespace gcoralOS
 {
     public class Kernel : Sys.Kernel
     {
-        Sys.FileSystem.CosmosVFS fs;
-        string currentdirectory = @"0:\";
-
         public int ScreenX = 1280;
         public int ScreenY = 720;
         public int galere = 320;
 
         private List<Pen> _iconColors;
 
-        public string versiona = "2.3";
+        public string versiona = "2.5";
         public string nameos = "Minedos";
         public string avtor = "Michail Khodakov";
         public string username = "You";
 
-        public int mode = 1;
+        Sys.FileSystem.CosmosVFS fs;
+        string currentdirectory = @"0:\";
+
+        public int mode = 0;
         bool dock = false;
 
 
@@ -49,44 +49,55 @@ namespace gcoralOS
         static byte[] wallbyte;
         //private DSMouse _cursor;
 
-        //private Bitmap _cursor;
-        //[ManifestResourceStream(ResourceName = "gcoralOS.cursor.bmp")]
-        //static byte[] cursoria;
+        private Bitmap _cursor;
+        [ManifestResourceStream(ResourceName = "gcoralOS.сursor.bmp")] static byte[] cursorbyte;
 
         [ManifestResourceStream(ResourceName = "gcoralOS.startup.wav")] public static byte[] start;
 
         public void DSMouse(Canvas canvas)
         {
-            //_cursor = new Bitmap(cursoria);
+            _cursor = new Bitmap(cursorbyte);
         }
 
         Canvas canvas;
         protected override void BeforeRun()
         {
-            fs = new Sys.FileSystem.CosmosVFS();
-            Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
+            if (mode == 0)
+            {
+                System.Console.Clear();
+                System.Console.WriteLine("------------------------------------------");
+                System.Console.WriteLine("Select mode for Minedos 2.5");
+                System.Console.WriteLine("1 - Start in text mode with file system");
+                System.Console.WriteLine("2 - Start in Ui mode(No file system)");
+                System.Console.WriteLine("3 - Start in Safe Ui Mode(No file system)");
+                System.Console.WriteLine("4 - Start in text mode(No file system)");
+                System.Console.WriteLine("5 - Shutdown your PC");
+                System.Console.WriteLine("------------------------------------------");
+            }
             if (mode == 1)
             {
                 System.Console.BackgroundColor = ConsoleColor.White;
                 System.Console.ForegroundColor = ConsoleColor.Black;
                 System.Console.Clear();
 
-                System.Console.WriteLine("Welcome to Minedos 2.3 by Michail Khodakov");
+                System.Console.WriteLine("Welcome to Minedos 2.5 by Michail Khodakov");
                 System.Console.WriteLine("Write 'help' to show all commands on this OS");
-
+                System.Console.WriteLine("Please write 'gui' for run Ui Launcher for this System");
                 System.Console.Beep(500, 100);
                 Thread.Sleep(100);
                 System.Console.Beep(500, 100);
                 Thread.Sleep(100);
                 System.Console.Beep(900, 300);
+                fs = new Sys.FileSystem.CosmosVFS();
+                Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
             }
-            else
+            if (mode == 2)
             {
                 canvas = FullScreenCanvas.GetFullScreenCanvas();
-                canvas.Mode = new Mode(ScreenX, ScreenY, ColorDepth.ColorDepth24);
+                canvas.Mode = new Mode(ScreenX, ScreenY, ColorDepth.ColorDepth32);
                 Sys.MouseManager.ScreenWidth = (uint)canvas.Mode.Columns;
                 Sys.MouseManager.ScreenHeight = (uint)canvas.Mode.Rows;
-                
+
                 _wall = new Bitmap(wallbyte);
 
                 System.Console.Beep(700, 100);
@@ -96,14 +107,50 @@ namespace gcoralOS
                 System.Console.Beep(500, 300);
                 //_cursor = new Bitmap(cursorbyte);
             }
-        }
+            if (mode == 3)
+            {
+                canvas = FullScreenCanvas.GetFullScreenCanvas();
+                canvas.Mode = new Mode(ScreenX, ScreenY, ColorDepth.ColorDepth32);
+                Sys.MouseManager.ScreenWidth = (uint)canvas.Mode.Columns;
+                Sys.MouseManager.ScreenHeight = (uint)canvas.Mode.Rows;
+
+                //_wall = new Bitmap(wallbyte);
+
+                System.Console.Beep(700, 100);
+                Thread.Sleep(100);
+                System.Console.Beep(700, 100);
+                Thread.Sleep(100);
+                System.Console.Beep(500, 300);
+                //_cursor = new Bitmap(cursorbyte);
+            }
+            if (mode == 4)
+            {
+                System.Console.BackgroundColor = ConsoleColor.White;
+                System.Console.ForegroundColor = ConsoleColor.Black;
+                System.Console.Clear();
+
+                System.Console.WriteLine("Welcome to Minedos 2.5 by Michail Khodakov");
+                System.Console.WriteLine("Write 'help' to show all commands on this OS");
+                System.Console.WriteLine("Please write 'gui' for run Ui Launcher for this System");
+                System.Console.Beep(500, 100);
+                Thread.Sleep(100);
+                System.Console.Beep(500, 100);
+                Thread.Sleep(100);
+                System.Console.Beep(900, 300);
+            }
+            if (mode == 5)
+            {
+                Sys.Power.Shutdown();
+            }
+
+            }
 
         public void DrawCursor()
         {
             Pen penBlacka = new Pen(Color.Black);
 
-            Sys.MouseManager.ScreenWidth = (uint) canvas.Mode.Columns;
-            Sys.MouseManager.ScreenHeight = (uint) canvas.Mode.Rows;
+            Sys.MouseManager.ScreenWidth = (uint)canvas.Mode.Columns;
+            Sys.MouseManager.ScreenHeight = (uint)canvas.Mode.Rows;
 
             int X = (int)Sys.MouseManager.X;
             int Y = (int)Sys.MouseManager.Y;
@@ -114,6 +161,14 @@ namespace gcoralOS
         }
         protected override void Run()
         {
+            if (mode == 0)
+            {
+                System.Console.ForegroundColor = ConsoleColor.Green;
+                System.Console.Write("User : ");
+                System.Console.ForegroundColor = ConsoleColor.Black;
+                var input = System.Console.ReadLine();
+                KeyLoader(input);
+            }
             if (mode == 1)
             {
                 System.Console.ForegroundColor = ConsoleColor.Green;
@@ -122,11 +177,20 @@ namespace gcoralOS
                 var input = System.Console.ReadLine();
                 HandleCommand(input);
             }
-            else
+            if (mode == 4)
+            {
+                System.Console.ForegroundColor = ConsoleColor.Green;
+                System.Console.Write("User : ");
+                System.Console.ForegroundColor = ConsoleColor.Black;
+                var input = System.Console.ReadLine();
+                HandleCommandSafe(input);
+            }
+            if (mode == 3)
             {
                 int X = (int)Sys.MouseManager.X;
                 int Y = (int)Sys.MouseManager.Y;
                 Pen pen = new Pen(Color.White);
+                Pen pena = new Pen(Color.Gray);
                 Pen penBlack = new Pen(Color.Black);
                 Pen reda = new Pen(Color.Red);
                 Pen greena = new Pen(Color.Green);
@@ -136,11 +200,10 @@ namespace gcoralOS
 
                 Pen blueda = new Pen(Color.DarkBlue);
                 canvas.Clear(Color.Blue);
-                canvas.DrawImage(_wall, 0, 0);
                 int taskbarHeight = 30; // Высота панели задач
 
                 // Рисуем задний фон панели задач
-                canvas.DrawFilledRectangle(pen, 0, 0, 1280, taskbarHeight);
+                canvas.DrawFilledRectangle(pena, 0, 0, 1280, taskbarHeight);
 
                 canvas.DrawString(DateTime.Now.ToString("HH:mm:ss"), Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 1050, 10);
                 canvas.DrawString(DateTime.Now.ToString("yyyy-MM-dd"), Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 1150, 10);
@@ -148,8 +211,8 @@ namespace gcoralOS
                 // Рисуем кнопку "Выключение ПК"
                 if (dock)
                 {
-                    canvas.DrawString("gcoralOS", Sys.Graphics.Fonts.PCScreenFont.Default, blueda, 20, 10);
-                    canvas.DrawFilledRectangle(pen, 0, taskbarHeight, 190, taskbarHeight + 120);
+                    canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, blueda, 20, 10);
+                    canvas.DrawFilledRectangle(pena, 0, taskbarHeight, 190, taskbarHeight + 120);
                     if (MouseManager.Y < taskbarHeight)
                     {
                         if (MouseManager.X >= 110 && MouseManager.X <= 210)
@@ -180,32 +243,32 @@ namespace gcoralOS
                     {
                         if (MouseManager.X >= 5 && MouseManager.X <= 100)
                         {
-                            canvas.DrawString("gcoralOS", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 20, 10);
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 20, 10);
                             canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
                             canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
                         }
                         if (MouseManager.X >= 110 && MouseManager.X <= 210)
                         {
-                            canvas.DrawString("gcoralOS", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
                             canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
                             canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 125, 10);
                         }
                         else if (MouseManager.X >= 215 && MouseManager.X <= 315)
                         {
-                            canvas.DrawString("gcoralOS", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
                             canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 230, 10);
                             canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
                         }
                         else
                         {
-                            canvas.DrawString("gcoralOS", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
                             canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
                             canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
                         }
                     }
                     else
                     {
-                        canvas.DrawString("gcoralOS", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                        canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
                         canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
                         canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
                     }
@@ -244,8 +307,136 @@ namespace gcoralOS
                 {
                     System.Console.Beep(380, 180);
                 }
-                
-                    DrawCursor();
+
+                DrawCursor();
+                canvas.Display();
+
+            }
+            if (mode == 2)
+            {
+                int X = (int)Sys.MouseManager.X;
+                int Y = (int)Sys.MouseManager.Y;
+                Pen pen = new Pen(Color.White);
+                Pen penBlack = new Pen(Color.Black);
+                Pen reda = new Pen(Color.Red);
+                Pen pena = new Pen(Color.Gray);
+                Pen greena = new Pen(Color.Green);
+                Pen bluea = new Pen(Color.Blue);
+                Pen yellowa = new Pen(Color.Yellow);
+                Pen magnetaa = new Pen(Color.Magenta);
+
+                Pen blueda = new Pen(Color.DarkBlue);
+                canvas.Clear(Color.Blue);
+                canvas.DrawImage(_wall, 0, 0);
+                int taskbarHeight = 30; // Высота панели задач
+
+                // Рисуем задний фон панели задач
+                canvas.DrawFilledRectangle(pena, 0, 0, 1280, taskbarHeight);
+
+                canvas.DrawString(DateTime.Now.ToString("HH:mm:ss"), Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 1050, 10);
+                canvas.DrawString(DateTime.Now.ToString("yyyy-MM-dd"), Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 1150, 10);
+
+                // Рисуем кнопку "Выключение ПК"
+                if (dock)
+                {
+                    canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, blueda, 20, 10);
+                    canvas.DrawFilledRectangle(pena, 0, taskbarHeight, 190, taskbarHeight + 120);
+                    if (MouseManager.Y < taskbarHeight)
+                    {
+                        if (MouseManager.X >= 110 && MouseManager.X <= 210)
+                        {
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 125, 10);
+                        }
+                        else if (MouseManager.X >= 215 && MouseManager.X <= 315)
+                        {
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 230, 10);
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                        }
+                        else
+                        {
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                        }
+                    }
+                    else
+                    {
+                        canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                        canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                    }
+                }
+                else
+                {
+                    if (MouseManager.Y < taskbarHeight)
+                    {
+                        if (MouseManager.X >= 5 && MouseManager.X <= 100)
+                        {
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 20, 10);
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                        }
+                        if (MouseManager.X >= 110 && MouseManager.X <= 210)
+                        {
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 125, 10);
+                        }
+                        else if (MouseManager.X >= 215 && MouseManager.X <= 315)
+                        {
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, bluea, 230, 10);
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                        }
+                        else
+                        {
+                            canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                            canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                            canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                        }
+                    }
+                    else
+                    {
+                        canvas.DrawString("Minedos", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 20, 10);
+                        canvas.DrawString("Shutdown", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 125, 10);
+                        canvas.DrawString("Restart", Sys.Graphics.Fonts.PCScreenFont.Default, penBlack, 230, 10);
+                    }
+                }
+
+                // Рисуем кнопку "Перезагрузка ПК"
+                //canvas.DrawFilledRectangle(pen, 110, 5, 210, taskbarHeight - 10);
+
+
+                if (Sys.MouseManager.MouseState == Sys.MouseState.Left)
+                {
+                    // Проверяем, на какую кнопку нажал пользователь
+                    if (MouseManager.Y < taskbarHeight)
+                    {
+                        if (MouseManager.X >= 5 && MouseManager.X <= 100)
+                        {
+                            System.Console.Beep(700, 100);
+                            dock = !dock;
+                        }
+                        if (MouseManager.X >= 110 && MouseManager.X <= 210)
+                        {
+                            Sys.Power.Shutdown();
+                        }
+                        else if (MouseManager.X >= 215 && MouseManager.X <= 315)
+                        {
+                            Sys.Power.Reboot();
+                        }
+                    }
+                    else
+                    {
+                        System.Console.Beep(700, 180);
+                    }
+                }
+
+                if (Sys.MouseManager.MouseState == Sys.MouseState.Right)
+                {
+                    System.Console.Beep(380, 180);
+                }
+
+                DrawCursor();
                 canvas.Display();
 
             }
@@ -412,7 +603,6 @@ namespace gcoralOS
                     dirname = System.Console.ReadLine();
                     Sys.FileSystem.VFS.VFSManager.DeleteFile(currentdirectory + dirname);
                     break;
-
                 default:
                     if (command.StartsWith("echo "))
                     {
@@ -426,6 +616,109 @@ namespace gcoralOS
             }
         }
 
+        private void HandleCommandSafe(string command)
+        {
+            switch (command.ToLower())
+            {
+                case "shutdown":
+                    Sys.Power.Shutdown();
+                    break;
+
+                case "reboot":
+                    Sys.Power.Reboot();
+                    break;
+
+                case "help":
+                    System.Console.ForegroundColor = ConsoleColor.Magenta;
+                    ShowHelp();
+                    System.Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+
+                case "help2":
+                    System.Console.ForegroundColor = ConsoleColor.Magenta;
+                    ShowHelp2();
+                    System.Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+
+                case "time":
+                    System.Console.ForegroundColor = ConsoleColor.Yellow;
+                    System.Console.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
+                    System.Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+                case "avtor":
+                    System.Console.ForegroundColor = ConsoleColor.Green;
+                    System.Console.WriteLine("Avtor : Michail Khodakov");
+                    System.Console.ForegroundColor = ConsoleColor.Black;
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("Version OS : 2.1");
+                    System.Console.WriteLine("Name OS : gcoralOS");
+                    break;
+
+                case "date":
+                    System.Console.ForegroundColor = ConsoleColor.Yellow;
+                    System.Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd"));
+                    System.Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+
+                case "timeanddate":
+                    System.Console.ForegroundColor = ConsoleColor.Red;
+                    System.Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    System.Console.ForegroundColor = ConsoleColor.Black;
+                    break;
+
+                case "cls":
+                    System.Console.Clear();
+                    break;
+
+                case "gui":
+                    mode += 1;
+                    BeforeRun();
+                    break;
+
+                case "setscreen":
+                    SetScreenCommand(command);
+                    break;
+                default:
+                    if (command.StartsWith("echo "))
+                    {
+                        EchoCommand(command);
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("I don't know what is ", command);
+                    }
+                    break;
+            }
+        }
+        private void KeyLoader(string command)
+        {
+            switch (command.ToLower())
+            {
+                case "1":
+                    mode =+ 1;
+                    BeforeRun();
+                    break;
+                case "2":
+                    mode = +2;
+                    BeforeRun();
+                    break;
+                case "3":
+                    mode = +3;
+                    BeforeRun();
+                    break;
+                case "4":
+                    mode = +4;
+                    BeforeRun();
+                    break;
+                case "5":
+                    mode = +5;
+                    BeforeRun();
+                    break;
+                default:
+                        System.Console.WriteLine("I don't know what is ", command);
+                    break;
+            }
+        }
         private void EchoCommand(string command)
         {
             string echoMessage = command.Substring(5); // Remove "echo " from the command
