@@ -29,7 +29,7 @@ namespace gcoralOS
 
         private List<Pen> _iconColors;
 
-        public string versiona = "2.5";
+        public string versiona = "2.4";
         public string nameos = "Minedos";
         public string avtor = "Michail Khodakov";
         public string username = "You";
@@ -66,7 +66,7 @@ namespace gcoralOS
             {
                 System.Console.Clear();
                 System.Console.WriteLine("------------------------------------------");
-                System.Console.WriteLine("Select mode for Minedos 2.5");
+                System.Console.WriteLine("Select mode for Minedos 2.4");
                 System.Console.WriteLine("1 - Start in text mode with file system");
                 System.Console.WriteLine("2 - Start in Ui mode(No file system)");
                 System.Console.WriteLine("3 - Start in Safe Ui Mode(No file system)");
@@ -80,7 +80,7 @@ namespace gcoralOS
                 System.Console.ForegroundColor = ConsoleColor.Black;
                 System.Console.Clear();
 
-                System.Console.WriteLine("Welcome to Minedos 2.5 by Michail Khodakov");
+                System.Console.WriteLine("Welcome to Minedos 2.4 by Michail Khodakov");
                 System.Console.WriteLine("Write 'help' to show all commands on this OS");
                 System.Console.WriteLine("Please write 'gui' for run Ui Launcher for this System");
                 System.Console.Beep(500, 100);
@@ -129,7 +129,7 @@ namespace gcoralOS
                 System.Console.ForegroundColor = ConsoleColor.Black;
                 System.Console.Clear();
 
-                System.Console.WriteLine("Welcome to Minedos 2.5 by Michail Khodakov");
+                System.Console.WriteLine("Welcome to Minedos 2.4 by Michail Khodakov");
                 System.Console.WriteLine("Write 'help' to show all commands on this OS");
                 System.Console.WriteLine("Please write 'gui' for run Ui Launcher for this System");
                 System.Console.Beep(500, 100);
