@@ -1,4 +1,4 @@
-# Minedos 2.2
+# Minedos 2.4
 This is a new operation system based on Cosmos OS
 Minedos have Ui Mode and Classic DOS mode with terminal
 In this page you can download Source and ISO file with Minedos OS!
